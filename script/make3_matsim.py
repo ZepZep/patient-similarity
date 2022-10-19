@@ -17,13 +17,13 @@ relevant_patients = set([
 ])
 
 computer = MatsimComputer(PACSIM_DATA)
-# computer.calculate(
-#     methods=["Rrv2"],
-#     # patterns=["*Fr01.feather"],
-#     patients=relevant_patients,
-#     id_letter="R",
-# )
-
 computer.calculate(
-    methods=["Mrv2"],
+    methods=["Rrv2"],
+    patterns=["*Vtfi200*.feather"],
+    patients=relevant_patients,
+    id_letter="R",
 )
+
+# computer.calculate(
+#     methods=["Mmms"],
+# )

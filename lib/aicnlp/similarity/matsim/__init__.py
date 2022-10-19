@@ -2,14 +2,14 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-from aicnlp.similarity.matsim import rv2
-from aicnlp.similarity.matsim import dcov
+from aicnlp.similarity.matsim import rv2, dcov, mms
 
 
 def get_methods():
     methods = {
         "rv2": rv2.calculate,
         "dco": dcov.calculate,
+        "mms": mms.calculate,
     }
     out = {}
     for method, fcn in methods.items():
