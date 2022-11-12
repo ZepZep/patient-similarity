@@ -12,31 +12,31 @@ class AbstractComputer:
 
     def _calculeteIO(self, methods=None, patterns=None):
         if methods is None:
-            methods_out = list(self.all_methods.keys())
+            methods_out = [(method, {}) for method in methods.keys()]
         else:
             methods_out = []
-            for method in methods:
+            for (method, cfg) in methods:
                 if method not in self.all_methods:
                     print(f"Unknown method {repr(method)}")
                 else:
-                    methods_out.append(method)
+                    methods_out.append((method, cfg))
 
         return methods_out, self._resolve_patterns(patterns)
 
     def _resolve_patterns(self, patterns):
         raise NotImplementedError()
 
-    def calculate(self, methods=None, patterns=None, **kwargs):
-        method_names, inputs = self._calculeteIO(methods, patterns)
+    def calculate(self, methods=None, patterns=None):
+        method_defs, inputs = self._calculeteIO(methods, patterns)
         for idi, input_file in enumerate(inputs):
             i_prog = f"[{idi+1:0{self.prec}d}/{len(inputs):0{self.prec}d}]"
             print(f"{i_prog} Working on input file {input_file}")
-            for idm, mn in enumerate(method_names):
-                m_prog = f"[{idm+1:0{self.prec}d}/{len(method_names):0{self.prec}d}]"
+            for idm, (mn, mcfg) in enumerate(method_defs):
+                m_prog = f"[{idm+1:0{self.prec}d}/{len(method_defs):0{self.prec}d}]"
                 print(f"  {m_prog} Working on method {mn}")
                 method_fcn, base_kwargs = self.all_methods[mn]
                 method_kwargs = base_kwargs.copy()
-                method_kwargs.update(kwargs)
+                method_kwargs.update(mcfg)
                 output = method_fcn(
                     prefix=" "*4,
                     data_dir=self.data_dir,

@@ -25,13 +25,8 @@ def calculate(prefix, data_dir, input_file, patients, id_letter):
         if i0 == i1:
             sim[i0, i1] = 1
             continue
-        cur_sim_mat = cosine_similarity(groups_list[i0], groups_list[i1])
-        maxes = np.hstack([
-            cur_sim_mat.max(axis=0),
-            cur_sim_mat.max(axis=1),
-        ])
-        cur_sim = maxes.mean()
 
+        cur_sim =  mms(groups_list[i0], groups_list[i1])
         sim[i0, i1] = cur_sim
         sim[i1, i0] = cur_sim
 
@@ -42,3 +37,11 @@ def calculate(prefix, data_dir, input_file, patients, id_letter):
     )
 
     print(f", DDONE.", flush=True)
+
+def mms(p1, p2):
+    cur_sim_mat = cosine_similarity(p1, p2)
+    maxes = np.hstack([
+        cur_sim_mat.max(axis=0),
+        cur_sim_mat.max(axis=1),
+    ])
+    return maxes.mean()

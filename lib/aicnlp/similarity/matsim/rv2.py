@@ -75,8 +75,9 @@ def calculate_rv2(prefix, dataList):
     scalArrList = []
 
     it = map(mat_worker, dataList)
-    it  = tqdm(it, desc=f"{prefix}  Calculating scalArrMods", total=len(dataList),
-               bar_format='{l_bar}{bar:30}{r_bar}{bar:-10b}')
+    if prefix is not None:
+        it  = tqdm(it, desc=f"{prefix}  Calculating scalArrMods", total=len(dataList),
+                   bar_format='{l_bar}{bar:30}{r_bar}{bar:-10b}')
     for scalArrMod in it:
         scalArrList.append(scalArrMod)
 
@@ -86,8 +87,9 @@ def calculate_rv2(prefix, dataList):
     it = np.array(np.triu_indices(len(dataList), k=1)).T
     ita = ( (i0, i1, scalArrList[i0], scalArrList[i1]) for i0, i1 in it )
     itp = map(sim_worker, ita)
-    itp = tqdm(itp, desc=f"{prefix}  Calculating  similarity", total=len(it),
-               bar_format='{l_bar}{bar:30}{r_bar}{bar:-10b}')
+    if prefix is not None:
+        itp = tqdm(itp, desc=f"{prefix}  Calculating  similarity", total=len(it),
+                   bar_format='{l_bar}{bar:30}{r_bar}{bar:-10b}')
     for i0, i1, rv in itp:
         C[i0, i1] = rv
         C[i1, i0] = rv

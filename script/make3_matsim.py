@@ -8,7 +8,6 @@ from aicnlp.similarity import MatsimComputer
 PACSIM_DATA = os.environ.get("AICOPE_SCRATCH") + "/pacsim"
 
 
-# relevant_patients = set([1,2,3,4,5])
 relevant_patients = set([
     127, 388, 506, 584, 726, 780, 910, 913, 1023, 1061, 1088, 1157, 1213, 1219, 1244, 1268,
     1339, 1548, 1583, 1633, 1710, 1713, 1768, 1771, 1852, 1854, 1919, 1965, 1970, 2048, 2090,
@@ -17,13 +16,27 @@ relevant_patients = set([
 ])
 
 computer = MatsimComputer(PACSIM_DATA)
+
 computer.calculate(
-    methods=["Rrv2"],
-    patterns=["*Vtfi200*.feather"],
-    patients=relevant_patients,
-    id_letter="R",
+    # patterns=["*Vd2v*.feather"],
+    methods=[
+        ("Reds", {
+            "patients": relevant_patients,
+            "id_letter": "R",
+        }),
+    ],
 )
 
 # computer.calculate(
-#     methods=["Mmms"],
+#     # patterns=["*Vd2v*.feather"],
+#     methods=[
+#         ("Rrv2", {
+#             "patients": relevant_patients,
+#             "id_letter": "R",
+#         }),
+#         ("Rmms", {
+#             "patients": relevant_patients,
+#             "id_letter": "R",
+#         }),
+#     ],
 # )
