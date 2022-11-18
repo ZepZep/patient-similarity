@@ -54,16 +54,17 @@ def mms(p1, p2):
 
 
 def eds(p1, p2, return_path=False):
-    sims = (cosine_similarity(p1, p2)+1)/2
+    sims = cosine_similarity(p1, p2)
+    sims_plus = (sims + 1 ) / 2
 
-    scores = np.zeros(sims.shape, dtype=float)
+    scores = np.zeros(sims_plus.shape, dtype=float)
     path = {}
-    scores[0,0] = sims[0,0]
+    scores[0,0] = sims_plus[0,0]
     for r in range(1, scores.shape[0]):
-        scores[r,0] = scores[r-1,0] * sims[r,0]
+        scores[r,0] = scores[r-1,0] * sims_plus[r,0]
         path[(r,0)] = (r-1,0)
     for c in range(1, scores.shape[1]):
-        scores[0,c] = scores[0,c-1] * sims[0,c]
+        scores[0,c] = scores[0,c-1] * sims_plus[0,c]
         path[(0,c)] = (0,c-1)
 
 
@@ -71,14 +72,15 @@ def eds(p1, p2, return_path=False):
         for c in range(1, scores.shape[1]):
             options = get_options(scores, r, c)
             best_score, pr, pc = max(options)
-            scores[r,c] = sims[r,c]*best_score
+            scores[r,c] = sims_plus[r,c]*best_score
             path[(r,c)] = (pr, pc)
 
     final_pos = scores.shape[0]-1, scores.shape[1]-1
     best_path = reconstruct_path(path, final_pos)
-    final_score = scores[-1, -1]
-    # return final_score
-    similarity_score = final_score**(1/len(best_path))
+    # final_score = scores[-1, -1]
+    # similarity_score = final_score**(1/len(best_path))
+
+    similarity_score = sum(sims[r,c] for r, c in best_path) / len(best_path)
 
     if return_path:
         return similarity_score, best_path
