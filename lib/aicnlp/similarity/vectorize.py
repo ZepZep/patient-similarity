@@ -17,7 +17,7 @@ LSAResult = namedtuple("LSAModel", ["vectorizer", "decomposer"])
 
 def get_methods():
     return {
-        "Vtfi": (vectorize_tfidf, {}),
+        "Vlsa": (vectorize_lsa, {}),
         "Vd2v": (vectorize_doc2vec, {}),
         "Vrbc": (vectorize_RobeCzech, {}),
     }
@@ -31,7 +31,7 @@ def tokenize(text):
     return text.split()
 
 
-def vectorize_tfidf(
+def vectorize_lsa(
     prefix, data_dir, input_file, dims,
     min_df=3, tokenize_fcn=tokenize,
     n_iter=5, random_state=42
@@ -64,7 +64,7 @@ def vectorize_tfidf(
 
         print(f"writing {len(records):7d} lines", end="", flush=True)
         records["vec"] = list(vectors_svd)
-        records.to_feather(f"{data_dir}/2/Vtfi{dim:03d}-{in_name}.feather")
+        records.to_feather(f"{data_dir}/2/Vlsa{dim:03d}-{in_name}.feather")
         print()
 
     print(f"{prefix}DONE.", flush=True)

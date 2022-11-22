@@ -6,7 +6,7 @@ from multiprocessing import Pool
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-def calculate(prefix, data_dir, input_file, patients, id_letter):
+def calculate(prefix, data_dir, input_file, patients, id_letter, workers=6):
     print(f"{prefix}loading", end="", flush=True)
     in_name = Path(input_file).with_suffix("").name
     records = pd.read_feather(input_file)
@@ -21,14 +21,13 @@ def calculate(prefix, data_dir, input_file, patients, id_letter):
     print(f",", flush=True)
     sim = np.zeros((len(groups), len(groups)), np.float32)
     it = np.array(np.triu_indices(len(groups), k=0)).T
-    for i0, i1 in tqdm(it, desc=f"{prefix}  Calculating  similarity"):
-        if i0 == i1:
-            sim[i0, i1] = 1
-            continue
-
-        cur_sim =  mms(groups_list[i0], groups_list[i1])
-        sim[i0, i1] = cur_sim
-        sim[i1, i0] = cur_sim
+    itlen = len(it)
+    it = ((i0, i1, groups_list[i0], groups_list[i1]) for i0, i1 in it)
+    it = tqdm(it, desc=f"{prefix}  Calculating  similarity", total=itlen)
+    with Pool(workers) as p:
+        for i0, i1, cur_sim in p.imap(worker_mms, it, chunksize=20000):
+            sim[i0, i1] = cur_sim
+            sim[i1, i0] = cur_sim
 
     print(f"{prefix}writing {sim.shape[0]}x{sim.shape[1]} matrix", end="", flush=True)
     np.savez_compressed(
@@ -38,8 +37,14 @@ def calculate(prefix, data_dir, input_file, patients, id_letter):
 
     print(f", DDONE.", flush=True)
 
-def mms(p1, p2):
-    cur_sim_mat = cosine_similarity(p1, p2)
+def worker_mms(args):
+    i0, i1, p0, p1 = args
+    if i0 == i1:
+        return i0, i1, 1
+    return i0, i1, mms(p0, p1)
+
+def mms(p0, p1):
+    cur_sim_mat = cosine_similarity(p0, p1)
     maxes = np.hstack([
         cur_sim_mat.max(axis=0),
         cur_sim_mat.max(axis=1),

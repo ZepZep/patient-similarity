@@ -6,7 +6,7 @@ from multiprocessing import Pool
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-def calculate(prefix, data_dir, input_file, patients, id_letter, workers=12):
+def calculate(prefix, data_dir, input_file, patients, id_letter, workers=6):
     print(f"{prefix}loading", end="", flush=True)
     in_name = Path(input_file).with_suffix("").name
     records = pd.read_feather(input_file)
@@ -25,7 +25,7 @@ def calculate(prefix, data_dir, input_file, patients, id_letter, workers=12):
     it = ((i0, i1, groups_list[i0], groups_list[i1]) for i0, i1 in it)
     it = tqdm(it, desc=f"{prefix}  Calculating  similarity", total=itlen)
     with Pool(workers) as p:
-        for i0, i1, cur_sim in p.imap(worker_eds, it):
+        for i0, i1, cur_sim in p.imap(worker_eds, it, chunksize=20000):
             sim[i0, i1] = cur_sim
             sim[i1, i0] = cur_sim
 
@@ -44,17 +44,9 @@ def worker_eds(args):
         return i0, i1, 1
     return i0, i1, eds(p0, p1)
 
-def mms(p1, p2):
-    cur_sim_mat = cosine_similarity(p1, p2)
-    maxes = np.hstack([
-        cur_sim_mat.max(axis=0),
-        cur_sim_mat.max(axis=1),
-    ])
-    return maxes.mean()
 
-
-def eds(p1, p2, return_path=False):
-    sims = cosine_similarity(p1, p2)
+def eds(p0, p1, return_path=False):
+    sims = cosine_similarity(p0, p1)
     sims_plus = (sims + 1 ) / 2
 
     scores = np.zeros(sims_plus.shape, dtype=float)
