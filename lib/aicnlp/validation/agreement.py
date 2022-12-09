@@ -19,6 +19,18 @@ import aicnlp
 PACSIM_DATA = os.environ.get("AICOPE_SCRATCH") + "/pacsim"
 
 
+corr_kendall = lambda x, y: stats.kendalltau(x, y, nan_policy='omit', alternative="greater")
+corr_spearman = lambda x, y: stats.spearmanr(x, y, alternative="greater")
+def corr_ks(x, y):
+    ck, pk = corr_kendall(x,y)
+    cs, ps = corr_spearman(x,y)
+    return (ck+cs)/2, (pk+ps)/2
+
+# corr_fcn = corr_spearman
+corr_fcn = corr_kendall
+# corr_fcn = corr_ks
+
+
 def extract_annotations(valdata):
     annotations = []
     pivots = {x["pivot_patient"] for x in valdata}
@@ -104,9 +116,9 @@ def get_correlations_ann(annotations):
         for a1, a2 in combinations(anns, 2):
             s1 = batch[batch["ann"] == a1].sort_values("proxy")
             s2 = batch[batch["ann"] == a2].sort_values("proxy")
-            cors.append(stats.spearmanr(s1["value"], s2["value"])[0])
+            cors.append(corr_fcn(s1["value"], s2["value"])[0])
 
-        # c, p = stats.spearmanr(s1, s2_all, alternative="greater")
+        # c, p = corr_fcn(s1, s2_all, alternative="greater")
         correlations.append({
             "pivot": pivot,
             "cat": cat,
@@ -132,7 +144,7 @@ def get_correlations_all(mean_annotations, predictions):
         #     print()
 
 
-        c, p = stats.spearmanr(batch["value"], s2_all["value"], alternative="greater")
+        c, p = corr_fcn(batch["value"], s2_all["value"])
         correlations.append({
             "pivot": pivot,
             "cat": cat,
@@ -140,7 +152,7 @@ def get_correlations_all(mean_annotations, predictions):
             "value": c,
             "pval": p,
         })
-        c, p = stats.spearmanr(batch["value"], s2_cat["value"], alternative="greater")
+        c, p = corr_fcn(batch["value"], s2_cat["value"])
         correlations.append({
             "pivot": pivot,
             "cat": cat,
