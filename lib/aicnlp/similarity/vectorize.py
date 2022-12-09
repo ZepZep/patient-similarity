@@ -34,7 +34,8 @@ def tokenize(text):
 def vectorize_lsa(
     prefix, data_dir, input_file, dims,
     min_df=3, tokenize_fcn=tokenize,
-    n_iter=5, random_state=42
+    n_iter=5, random_state=42,
+    ablation=False, ablid=0,
     ):
 
     print(f"{prefix}loading", end="", flush=True)
@@ -62,9 +63,14 @@ def vectorize_lsa(
         else:
             vectors_svd = vectors_emb
 
+        if ablation:
+            tag = f"AVlsa_d{dim}_m{min_df}_i{n_iter}_a{ablid}"
+        else:
+            tag = f"Vlsa{dim:03d}"
+
         print(f"writing {len(records):7d} lines", end="", flush=True)
         records["vec"] = list(vectors_svd)
-        records.to_feather(f"{data_dir}/2/Vlsa{dim:03d}-{in_name}.feather")
+        records.to_feather(f"{data_dir}/2/{tag}-{in_name}.feather")
         print()
 
     print(f"{prefix}DONE.", flush=True)
@@ -86,6 +92,7 @@ def vectorize_doc2vec(
     prefix, data_dir, input_file, dims,
     window=5, min_count=5, workers=4, epochs=10,
     tokenize_fcn=tokenize,
+    ablation=False, ablid=0,
     ):
 
     print(f"{prefix}loading", end="", flush=True)
@@ -108,9 +115,14 @@ def vectorize_doc2vec(
             callbacks=[tqdmcb]
         )
 
+        if ablation:
+            tag = f"AVd2v_d{dim}_m{min_count}_w{window}_e{epochs}_a{ablid}"
+        else:
+            tag = f"Vd2v{dim:03d}"
+
         print(f"{prefix}  writing {len(records):7d} lines", end="", flush=True)
         records["vec"] = list(model.dv.vectors)
-        records.to_feather(f"{data_dir}/2/Vd2v{dim:03d}-{in_name}.feather")
+        records.to_feather(f"{data_dir}/2/{tag}-{in_name}.feather")
         print()
 
     print(f"{prefix}DONE.", flush=True)
@@ -119,6 +131,8 @@ def vectorize_RobeCzech(
     prefix, data_dir, input_file, dims=[768],
     batch_size=16,
     n_iter=5, random_state=42,
+    finetuned=True,
+    ablation=False, ablid=0,
     ):
 
     import transformers
@@ -142,8 +156,13 @@ def vectorize_RobeCzech(
             truncation=True,
         )
 
+    if finetuned:
+        model_path = f"{data_dir}/parts/checkpoint-180000/"
+    else:
+        model_path = "ufal/robeczech-base"
+
     model = AutoModel.from_pretrained(
-        f"{data_dir}/parts/checkpoint-180000/",
+        model_path,
         output_loading_info=False,
     )
     model = model.half().cuda()
@@ -175,9 +194,14 @@ def vectorize_RobeCzech(
         else:
             vectors_svd = vectors_emb
 
+        if ablation:
+            tag = f"AVrbc_d{dim}_i{n_iter}_f{int(finetuned)}_a{ablid}"
+        else:
+            tag = f"Vrbc{dim:03d}"
+
         print(f"writing {len(records):7d} lines", end="", flush=True)
         records["vec"] = list(vectors_svd)
-        records.to_feather(f"{data_dir}/2/Vrbc{dim:03d}-{in_name}.feather")
+        records.to_feather(f"{data_dir}/2/{tag}-{in_name}.feather")
         print()
 
     print(f"{prefix}DONE.", flush=True)
