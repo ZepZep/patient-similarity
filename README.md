@@ -3,7 +3,7 @@
 This repository contains code that was used in a Masters thesis called ["Patient similarity based on unstructured clinical notes"](https://is.muni.cz/th/c9gln/) written by Petr Zelina.
 
 ## Environment variables
-The scripts and notebooks expet two envoronment variables:
+The scripts and notebooks expcet two envoronment variables:
 * `AICOPE_PY_LIB` which contains a path that points to the `lib` folder of this repository. It is used to append the python path.
 * `AICOPE_SCRATCH` path where the data and various outputs should be stored and loaded from. It should contain a `pacsim` folder
 
@@ -24,7 +24,8 @@ The scripts and notebooks expet two envoronment variables:
     * `notebook/vis_validation.ipynb` for grid-search and validation results
     * `notebook/vis_ablation.ipynb` for vectorization methods ablation results
 6. dashboards
-    * todo
+    * `dashboard/start_validation_dashboard.py` starts the Dash-based validation dashboard. It is useful for inspecting the interaction between filtering, vectorization and matrix similarity methods.
+    * `dashboard/start_similarity_dashboard.py` starts the Dash-based similarity dashboard. It is useful for viewing through similar patients.
 
 
 ## Docker

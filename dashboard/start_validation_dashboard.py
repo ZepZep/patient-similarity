@@ -34,7 +34,7 @@ from aicnlp.validation import validation_dashboard
 
 app = validation_dashboard.get_app(
     mgr, mean_annotations, all_predictions, all_correlations,
-    name="simdash",
+    name="valdash",
     lorem=True,
 )
 

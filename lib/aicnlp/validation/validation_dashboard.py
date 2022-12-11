@@ -352,12 +352,10 @@ def add_callbacks(app, mgr, mean_annotations, all_predictions, all_correlations)
 
 DO_LOREM = False
 
-def get_app(mgr, mean_annotations, all_predictions, all_correlations ,name=None, lorem=False):
+def get_app(mgr, mean_annotations, all_predictions, all_correlations ,name="valdash", lorem=False):
     global DO_LOREM
     DO_LOREM = lorem
     external_stylesheets = [dbc.themes.BOOTSTRAP]
-#     if name is None:
-#         name = "srv_" + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M")
 
     app = JupyterDash(name, external_stylesheets=external_stylesheets)
 
