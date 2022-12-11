@@ -107,13 +107,13 @@ def create_parts(records):
     tid2t, t2tid = get_good_titles(parts)
     titles = pd.DataFrame({
         "title": tid2t.values(),
-        "freq": parts.label.value_counts()[1:].sort_index()
+        "freq": parts.label.value_counts().iloc[1:].sort_index()
     })
 
     print("--> Adding labels")
     parts["label"] = parts["stitle"].map(defaultdict(int, t2tid))-1
 
-    return parts, titles
+    return parts, titles, tid2t
 
 
 def tokenize_function(examples):
@@ -126,8 +126,9 @@ def tokenize_function(examples):
 
 
 def make_segments(records, out_path):
-    records = load_records()
-    parts, titles = create_parts(records)
+    parts, titles, tid2t = create_parts(records)
 
     parts.reset_index(drop=True).to_feather(f"{out_path}/parts.feather")
     titles.to_feather(f"{out_path}/titles.feather")
+    with open(f"{out_path}/tid2t.pickle", "wb") as f:
+        pickle.dump(tid2t, f)

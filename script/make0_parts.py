@@ -9,8 +9,8 @@ PACSIM_DATA = os.environ.get("AICOPE_SCRATCH") + "/pacsim"
 HF_MODEL = "ufal/robeczech-base"
 PARTS_PATH = f"{PACSIM_DATA}/parts/"
 
-os.mkdir(f"{PARTS_PATH}/predictions")
-os.mkdir(f"{PARTS_PATH}/models")
+os.makedirs(f"{PARTS_PATH}/predictions", exist_ok=True)
+os.makedirs(f"{PARTS_PATH}/models", exist_ok=True)
 
 
 # Load data with manager
