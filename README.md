@@ -21,7 +21,7 @@ The scripts and notebooks expet two envoronment variables:
     * `notebook/??` for segment classification statistics
     * `notebook/vis_general.ipynb` for visualisations of filtering statistics, matrix similarity methods comparison, and vectorization timing statistics
     * `notebook/vis_agreement.ipynb` for inter-annotator agreement results
-    * `notebook/vis_validation.ipynb` for validation results
+    * `notebook/vis_validation.ipynb` for grid-search and validation results
     * `notebook/vis_ablation.ipynb` for vectorization methods ablation results
 6. dashboards
     * todo
