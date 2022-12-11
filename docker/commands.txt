@@ -1,0 +1,10 @@
+#build docker
+docker build --network host -t zep/hug .
+
+
+# run docker
+docker run --gpus all -it --network host --name hug \
+    -v /home/ubuntu/:/workspace/home/ \
+    -v /mnt/data/C50-retrospective/:/workspace/data/ \
+    -v /mnt/petr/:/workspace/scratch/ \
+    zep/hug
