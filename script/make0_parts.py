@@ -15,6 +15,12 @@ os.makedirs(f"{PARTS_PATH}/models", exist_ok=True)
 def section(title, w=50):
     print("\n\n"+"#"*w+"\n"+f"{title:^{w}}\n"+"#"*w+"\n")
 
+
+# Ensure data for manager
+from aicnlp.parts.dummy_data import ensure_mgr_data
+ensure_mgr_data(f"{PACSIM_DATA}/mgrdata")
+
+
 # Load data with manager
 from aicnlp import emb_mgr
 mgr = emb_mgr.EmbMgr(f"{PACSIM_DATA}/mgrdata")
