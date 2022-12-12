@@ -17,26 +17,50 @@ relevant_patients = set([
 
 computer = MatsimComputer(PACSIM_DATA)
 
-computer.calculate(
-    # patterns=["*Vd2v*.feather"],
-    methods=[
-        ("Reds", {
-            "patients": relevant_patients,
-            "id_letter": "R",
-        }),
-    ],
-)
+# PRESET = "custom"
+# PRESET = "recalculate relevant"
+PRESET = "recalculate all"
 
-# computer.calculate(
-#     # patterns=["*Vd2v*.feather"],
-#     methods=[
-#         ("Rrv2", {
-#             "patients": relevant_patients,
-#             "id_letter": "R",
-#         }),
-#         ("Rmms", {
-#             "patients": relevant_patients,
-#             "id_letter": "R",
-#         }),
-#     ],
-# )
+if PRESET == "custom":
+    computer.calculate(
+        # patterns=["*Vd2v*.feather"],
+        methods=[
+            ("Reds", {
+                "patients": relevant_patients,
+                "id_letter": "R",
+            }),
+        ],
+    )
+elif PRESET == "recalculate relevant":
+    computer.calculate(
+        # patterns=["*Vd2v*.feather"],
+        methods=[
+            ("Rrv2", {
+                "patients": relevant_patients,
+                "id_letter": "R",
+            }),
+            ("Rmms", {
+                "patients": relevant_patients,
+                "id_letter": "R",
+            }),
+            ("Reds", {
+                "patients": relevant_patients,
+                "id_letter": "R",
+            }),
+        ],
+    )
+
+elif PRESET == "recalculate all":
+    # recalculate entirepacsim matrices
+    computer.calculate(
+        # patterns=["*Vlsa200*Fall*.feather"],
+        methods=[
+            ("Mrv2", {}),
+            ("Mmms", {}),
+            ("Meds", {}),
+        ],
+    )
+
+else:
+    print(f"Unknown preset {repr(PRESET)}")
+    exit(1)

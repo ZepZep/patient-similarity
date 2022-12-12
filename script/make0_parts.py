@@ -71,6 +71,7 @@ section("RobeCzech")
 from aicnlp.parts.robeczech import train_robeczech
 train_robeczech(
     parts_path=PARTS_PATH,
+    batch_size=2,
     hf_model=HF_MODEL,
 )
 

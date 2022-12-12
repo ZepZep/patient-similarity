@@ -8,13 +8,13 @@ from aicnlp.similarity import VectorizeComputer
 
 PACSIM_DATA = os.environ.get("AICOPE_SCRATCH") + "/pacsim"
 
-PRESET = "custom"
-# PRESET = "recalculate"
+# PRESET = "custom"
+PRESET = "recalculate"
 # PRESET = "ablation"
 
 computer = VectorizeComputer(PACSIM_DATA)
 
-if preset == "custom":
+if PRESET == "custom":
     computer.calculate(
         # patterns=["Fr01.feather"],
         methods=[
@@ -26,7 +26,7 @@ if preset == "custom":
             }),
         ],
     )
-elif preset == "recalculate":
+elif PRESET == "recalculate":
     computer.calculate(
         # patterns=["Fr*.feather"],
         methods=[
@@ -45,11 +45,12 @@ elif preset == "recalculate":
             ("Vrbc", {
                 "dims": [50, 200],
                 "n_iter": 10,
+                "batch_size": 2,
                 "random_state": 42,
             }),
         ],
     )
-elif preset == "ablation":
+elif PRESET == "ablation":
     ablmethods = [
         ("Vlsa", {
             "dims": [[50]],
@@ -100,5 +101,5 @@ elif preset == "ablation":
         methods=methods
     )
 else:
-    print(f"Unknown preset {repr(preset)}")
+    print(f"Unknown preset {repr(PRESET)}")
     exit(1)

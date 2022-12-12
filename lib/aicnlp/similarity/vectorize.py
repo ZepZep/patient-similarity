@@ -157,7 +157,7 @@ def vectorize_RobeCzech(
         )
 
     if finetuned:
-        model_path = f"{data_dir}/parts/checkpoint-180000/"
+        model_path = f"{data_dir}/parts/models/robeczech/manual_save"
     else:
         model_path = "ufal/robeczech-base"
 

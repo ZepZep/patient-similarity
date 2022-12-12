@@ -27,9 +27,6 @@ def reduce_dataset(ds):
     return Dataset.from_pandas(df[ri]).remove_columns(['__index_level_0__'])
 
 
-
-
-
 metric = load_metric("accuracy")
 
 def compute_metrics(eval_pred):
@@ -38,7 +35,7 @@ def compute_metrics(eval_pred):
     acc = metric.compute(predictions=predictions, references=labels)
     return acc
 
-def train_robeczech( parts_path, hf_model="ufal/robeczech-base"):
+def train_robeczech(parts_path, batch_size=32, hf_model="ufal/robeczech-base"):
     print("--> Loading dataset")
     dtrain = Dataset.load_from_disk(f"{parts_path}/train.hf")
     dtest = Dataset.load_from_disk(f"{parts_path}/test.hf")
@@ -55,7 +52,7 @@ def train_robeczech( parts_path, hf_model="ufal/robeczech-base"):
 
     training_args = TrainingArguments(
         output_dir=f"{parts_path}/models/robeczech",
-        per_device_train_batch_size=32,
+        per_device_train_batch_size=batch_size,
         gradient_accumulation_steps=4,
         num_train_epochs=10,
         learning_rate=5e-05,
@@ -72,8 +69,12 @@ def train_robeczech( parts_path, hf_model="ufal/robeczech-base"):
         compute_metrics=compute_metrics,
     )
 
+    trainer.save_model(f"{parts_path}/models/robeczech/manual_save")
+
     print("--> Training")
     trainer.train()
+
+    trainer.save_model(f"{parts_path}/models/robeczech/manual_save")
 
     print("--> Prediction")
     y = trainer.predict(dtest).predictions.astype(np.float16)
