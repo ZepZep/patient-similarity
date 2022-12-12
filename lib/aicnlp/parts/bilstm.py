@@ -4,6 +4,7 @@ from itertools import product
 from tqdm.auto import tqdm
 
 from datasets import Dataset
+import tensorflow as tf
 from tensorflow.keras import Input
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, LSTM, Embedding, Dropout, Bidirectional
@@ -52,7 +53,7 @@ class SaveCallback(Callback):
         self.model.save(self.model_name)
 
 
-def train_bilstm(parts_path, cut=150, dropout=0.1):
+def train_bilstm(parts_path, cut=150, epochs=10, dropout=0.1):
     model_name = f"{parts_path}/models/bilstm"
 
     print("--> Loading dataset")
@@ -71,7 +72,7 @@ def train_bilstm(parts_path, cut=150, dropout=0.1):
     print("\n--> Training")
 
     model.fit(
-        xt, yt, batch_size=512, epochs=10,
+        xt, yt, batch_size=512, epochs=epochs,
         validation_data=(xv,yv),
         verbose=1,
         callbacks=[SaveCallback(model, model_name)],

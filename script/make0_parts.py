@@ -60,6 +60,7 @@ from aicnlp.parts.bilstm import train_bilstm
 train_bilstm(
     parts_path=PARTS_PATH,
     cut=150,
+    epochs=10,
     dropout=0.1,
 )
 
@@ -68,6 +69,13 @@ train_bilstm(
 ## might need to change the batch size or other arguments
 ## to fit in your GPU in robeczech.py
 section("RobeCzech")
+
+print("Trying to cleanum Tensorflow from GPU")
+import numba.cuda
+numba.cuda.select_device(0)
+numba.cuda.close()
+print("Done\n")
+
 from aicnlp.parts.robeczech import train_robeczech
 train_robeczech(
     parts_path=PARTS_PATH,
