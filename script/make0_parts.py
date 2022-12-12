@@ -12,6 +12,8 @@ PARTS_PATH = f"{PACSIM_DATA}/parts/"
 os.makedirs(f"{PARTS_PATH}/predictions", exist_ok=True)
 os.makedirs(f"{PARTS_PATH}/models", exist_ok=True)
 
+def section(title, w=50):
+    print("\n\n"+"#"*w+"\n"+f"{title:^{w}}\n"+"#"*w+"\n")
 
 # Load data with manager
 from aicnlp import emb_mgr
@@ -19,43 +21,50 @@ mgr = emb_mgr.EmbMgr(f"{PACSIM_DATA}/mgrdata")
 
 
 # Segment notes, extract and normalize titles
+section("Extraction")
 from aicnlp.parts.segments import make_segments
 make_segments(
+    parts_path=PARTS_PATH,
     records=mgr.rec,
-    out_path=PARTS_PATH
 )
 
 
 # Train vector models, title similarity
+section("Vectors")
 from aicnlp.parts.vectors import train_vectors
 train_vectors(
+    parts_path=PARTS_PATH,
     dim=50,
     hidden_size=64,
-    out_path=PARTS_PATH,
 )
 
 
 # Create HuggingFace dataset
+section("HF dataset")
 from aicnlp.parts.hf_dataset import make_hf_dataset
 make_hf_dataset(
+    parts_path=PARTS_PATH,
     hf_model=HF_MODEL,
-    out_path=PARTS_PATH,
 )
 
 
 # Train Bi-LSTM model
+section("Bi-LSTM")
 from aicnlp.parts.bilstm import train_bilstm
 train_bilstm(
+    parts_path=PARTS_PATH,
     cut=150,
     dropout=0.1,
-    out_path=PARTS_PATH,
 )
 
 
 # Train RobeCzech model (transformer model)
+## might need to change the batch size or other arguments
+## to fit in your GPU in robeczech.py
+section("RobeCzech")
 from aicnlp.parts.robeczech import train_robeczech
 train_robeczech(
+    parts_path=PARTS_PATH,
     hf_model=HF_MODEL,
-    out_path=PARTS_PATH,
 )
 

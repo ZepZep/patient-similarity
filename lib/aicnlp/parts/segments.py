@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from tqdm.auto import tqdm
 import unidecode
+import pickle
 
 def cut_record(text):
     lines = text.split("\n")
@@ -105,13 +106,15 @@ def create_parts(records):
 
     print("--> Filtering titles")
     tid2t, t2tid = get_good_titles(parts)
+
+    print("--> Adding labels")
+    parts["label"] = parts["stitle"].map(defaultdict(int, t2tid))-1
+
+    print("--> Exporting titles")
     titles = pd.DataFrame({
         "title": tid2t.values(),
         "freq": parts.label.value_counts().iloc[1:].sort_index()
     })
-
-    print("--> Adding labels")
-    parts["label"] = parts["stitle"].map(defaultdict(int, t2tid))-1
 
     return parts, titles, tid2t
 
@@ -125,10 +128,10 @@ def tokenize_function(examples):
     )
 
 
-def make_segments(records, out_path):
+def make_segments(parts_path, records):
     parts, titles, tid2t = create_parts(records)
 
-    parts.reset_index(drop=True).to_feather(f"{out_path}/parts.feather")
-    titles.to_feather(f"{out_path}/titles.feather")
-    with open(f"{out_path}/tid2t.pickle", "wb") as f:
+    parts.reset_index(drop=True).to_feather(f"{parts_path}/parts.feather")
+    titles.to_feather(f"{parts_path}/titles.feather")
+    with open(f"{parts_path}/tid2t.pickle", "wb") as f:
         pickle.dump(tid2t, f)

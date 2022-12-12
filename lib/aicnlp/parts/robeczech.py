@@ -38,10 +38,10 @@ def compute_metrics(eval_pred):
     acc = metric.compute(predictions=predictions, references=labels)
     return acc
 
-def train_robeczech(hf_model="ufal/robeczech-base", out_path):
+def train_robeczech( parts_path, hf_model="ufal/robeczech-base"):
     print("--> Loading dataset")
-    dtrain = Dataset.load_from_disk(f"{out_path}/train.hf")
-    dtest = Dataset.load_from_disk(f"{out_path}/test.hf")
+    dtrain = Dataset.load_from_disk(f"{parts_path}/train.hf")
+    dtest = Dataset.load_from_disk(f"{parts_path}/test.hf")
 
     #print("--> Reducing dataset")
     #dtrain = reduce_dataset(dtrain)
@@ -54,7 +54,7 @@ def train_robeczech(hf_model="ufal/robeczech-base", out_path):
     )
 
     training_args = TrainingArguments(
-        output_dir=f"{out_path}/models/robeczech",
+        output_dir=f"{parts_path}/models/robeczech",
         per_device_train_batch_size=32,
         gradient_accumulation_steps=4,
         num_train_epochs=10,
@@ -79,4 +79,4 @@ def train_robeczech(hf_model="ufal/robeczech-base", out_path):
     y = trainer.predict(dtest).predictions.astype(np.float16)
     print(y.shape)
 
-    np.savez_compressed(f"{out_path}/predictions/pred_robeczech.npz", y=y)
+    np.savez_compressed(f"{parts_path}/predictions/pred_robeczech.npz", y=y)

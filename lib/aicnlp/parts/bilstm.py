@@ -6,7 +6,7 @@ from tqdm.auto import tqdm
 from datasets import Dataset
 from tensorflow.keras import Input
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import LSTM, Embedding, Dropout, Bidirectional
+from tensorflow.keras.layers import Dense, LSTM, Embedding, Dropout, Bidirectional
 from tensorflow.keras.callbacks import Callback
 
 
@@ -16,7 +16,7 @@ def load_ds(path):
     return ds["input_ids"], ds["label"]
 
 
-def build_network(vocab, labels, dropout):
+def build_network(vocab, labels, dropout, cut):
     inptW = Input(shape=(cut,))
     embedding = Embedding(input_dim=vocab, output_dim=128,
                          input_length=cut, mask_zero=True)
@@ -43,20 +43,21 @@ def build_network(vocab, labels, dropout):
 
 
 class SaveCallback(Callback):
-    def __init__(self, model_name):
+    def __init__(self, model, model_name):
+        self.model=model
         self.model_name = model_name
 
     def on_epoch_end(self, *args):
         print("\nsaving model")
-        model.save(self.model_name)
+        self.model.save(self.model_name)
 
 
-def train_bilstm(cut=150, dropout=0.1, out_path):
-    model_name = f"{out_path}/models/bilstm"
+def train_bilstm(parts_path, cut=150, dropout=0.1):
+    model_name = f"{parts_path}/models/bilstm"
 
     print("--> Loading dataset")
-    xt, yt = load_ds(f"{out_path}/train.hf")
-    xv, yv = load_ds(f"{out_path}/test.hf")
+    xt, yt = load_ds(f"{parts_path}/train.hf")
+    xv, yv = load_ds(f"{parts_path}/test.hf")
 
     xt = xt[:, 1:cut+1]
     xv = xv[:, 1:cut+1]
@@ -64,7 +65,7 @@ def train_bilstm(cut=150, dropout=0.1, out_path):
     print("--> Building NN")
     vocab_size = 51961
     n_labels = 2078
-    model = build_network(vocab=vocab_size, labels=n_labels, dropout=dropout)
+    model = build_network(vocab=vocab_size, labels=n_labels, dropout=dropout, cut=cut)
     model.summary()
 
     print("\n--> Training")
@@ -73,11 +74,11 @@ def train_bilstm(cut=150, dropout=0.1, out_path):
         xt, yt, batch_size=512, epochs=10,
         validation_data=(xv,yv),
         verbose=1,
-        callbacks=[SaveCallback(model_name)],
+        callbacks=[SaveCallback(model, model_name)],
     )
 
     model.save(model_name)
 
     print("\n--> Predicting")
     y = model.predict(xv)
-    np.savez_compressed(f"{out_path}/predictions/pred_bilstm.npz", y=y)
+    np.savez_compressed(f"{parts_path}/predictions/pred_bilstm.npz", y=y)

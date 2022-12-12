@@ -95,7 +95,7 @@ def vectorize_d2v(ds, dim, window=5, min_count=5, workers=4, epochs=10):
 
 
 # define NN models
-def make_model(vectors, n_titles, dropout=0.0):
+def make_model(vectors, n_titles, hidden_size, dropout=0.0):
     lin = tf.keras.Input(shape=vectors[0].shape, name="input")
     x = lin
     x = layers.Dropout(dropout)(x)
@@ -111,11 +111,11 @@ def make_model(vectors, n_titles, dropout=0.0):
     return model
 
 # main function
-def train_vectors(dim=50, hidden_size=64, out_path):
+def train_vectors(parts_path, dim=50, hidden_size=64):
 
     print("--> Loading Dataset")
-    parts = pd.read_feather(f"{out_path}/parts.feather")
-    titles = pd.read_feather(f"{out_path}/titles.feather")
+    parts = pd.read_feather(f"{parts_path}/parts.feather")
+    titles = pd.read_feather(f"{parts_path}/titles.feather")
     relevant = parts.query("label >= 0").reset_index(drop=True)
 
 
@@ -134,10 +134,10 @@ def train_vectors(dim=50, hidden_size=64, out_path):
 
     print("--> Training Doc2Vec Vectorizer")
     vectors_d2v_train, vectors_d2v_test,  model_d2v = vectorize_d2v(ds, dim)
-    np.save(f"{out_path}/d2v_titles.npy", model_d2v.dv.vectors)
+    np.save(f"{parts_path}/d2v_titles.npy", model_d2v.dv.vectors)
 
     print("--> Training LSA Classifier")
-    nn_lsa = make_model(vectors_lsa_train, len(t2tid), dropout=0.0)
+    nn_lsa = make_model(vectors_lsa_train, len(titles), hidden_size, dropout=0.0)
     nn_lsa.summary()
 
     nn_lsa.fit(
@@ -149,11 +149,11 @@ def train_vectors(dim=50, hidden_size=64, out_path):
 
     print("--> Making LSA Predictions")
     pred_lsa = nn_lsa.predict(vectors_lsa_test)
-    np.savez_compressed(f"{out_path}/predictions/pred_lsa.npz", y=pred_lsa.astype(np.float16))
+    np.savez_compressed(f"{parts_path}/predictions/pred_lsa.npz", y=pred_lsa.astype(np.float16))
 
 
     print("--> Training Doc2Vec Classifier")
-    nn_d2v = make_model(vectors_d2v_train, len(t2tid), dropout=0.0)
+    nn_d2v = make_model(vectors_d2v_train, len(titles), hidden_size, dropout=0.0)
     nn_d2v.summary()
 
     nn_d2v.fit(
@@ -165,4 +165,4 @@ def train_vectors(dim=50, hidden_size=64, out_path):
 
     print("--> Making Doc2Vec Predictions")
     pred_d2v = nn_d2v.predict(np.stack(vectors_d2v_test))
-    np.savez_compressed(f"{out_path}/predictions/pred_d2v.npz", y=pred_d2v.astype(np.float16))
+    np.savez_compressed(f"{parts_path}/predictions/pred_d2v.npz", y=pred_d2v.astype(np.float16))
