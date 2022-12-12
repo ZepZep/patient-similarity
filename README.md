@@ -20,7 +20,7 @@ You can also pull a pre-built docker image from [DockerHub](https://hub.docker.c
 
 You need [Nvidia docker](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) for GPU support.
 
-The docker image starts a Jupyter server on [http://localhost:4444/](http://localhost:4444/). You can connect to it with your browser and use the notebooks or the terminal. The password is `password`. Alternatively, you `docker exec` bash in the container.
+The docker image starts a Jupyter server on [http://localhost:4444/](http://localhost:4444/). You can connect to it with your browser and use the notebooks or the terminal. The password is `password`. Alternatively, you can `docker exec` bash in the container.
 
 ```
 # build docker image
