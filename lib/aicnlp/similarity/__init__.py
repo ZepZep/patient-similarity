@@ -12,7 +12,7 @@ class AbstractComputer:
 
     def _calculeteIO(self, methods=None, patterns=None):
         if methods is None:
-            methods_out = [(method, {}) for method in methods.keys()]
+            methods_out = [(method, {}) for method in self.all_methods.keys()]
         else:
             methods_out = []
             for (method, cfg) in methods:
@@ -46,9 +46,12 @@ class AbstractComputer:
 
 
 class RecordFilterComputer(AbstractComputer):
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, categories_file=None):
         super().__init__(data_dir)
-        self.categories_file = "parts/categories_pred.feather"
+        if categories_file is None:
+            self.categories_file = "parts/categories_pred.feather"
+        else:
+            self.categories_file = categories_file
         self.parts_file = "parts/parts_pred.feather"
         self.all_methods = aicnlp.similarity.filter.get_methods(
             f"{data_dir}/{self.categories_file}"

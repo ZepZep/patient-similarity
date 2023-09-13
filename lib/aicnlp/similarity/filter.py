@@ -29,9 +29,16 @@ def filter_records(prefix, data_dir, input_file, categories_file, filter_setting
 
     print(", filtering", end="", flush=True)
     categories.set_index("index")
-    relevant_categories = set(categories[categories[filter_setting]].index)
+    filter_col = categories[filter_setting]
+    if categories[filter_setting].dtype == int:
+        relevant_tid  = pd.Series(filter_col[filter_col == 1].index) + 1
+        relevant_pred = pd.Series(filter_col[filter_col == 2].index) + 1
+        selector = parts["tid"].isin(relevant_tid) | parts["pred"].isin(relevant_pred)
+    else:
+        relevant_categories = pd.Series(categories[filter_col].index) + 1
+        selector = parts["pred"].isin(relevant_categories)
     old_names = "rid pid rord srord text".split()
-    relevant_parts = parts[old_names][parts["pred"].isin(relevant_categories)]
+    relevant_parts = parts[old_names][selector]
 
     print(", merging", end="", flush=True)
     relevant_texts = relevant_parts.groupby(["pid", "rord"])["text"].apply("\n<br>\n".join)
