@@ -2,6 +2,12 @@
 
 This repository contains code that was used in a Masters thesis called ["Patient similarity based on unstructured clinical notes"](https://is.muni.cz/th/c9gln/) written by Petr Zelina.
 
+## Relevant publications
+* [Unsupervised extraction, labelling and clustering of segments from clinical notes](https://arxiv.org/pdf/2211.11799) ([git](https://github.com/ZepZep/clinical-notes-extraction))
+* [Extraction, labeling, clustering, and semantic mapping of segments from clinical notes](https://ieeexplore.ieee.org/abstract/document/10123130) ([git](https://github.com/ZepZep/clinical-notes-extraction))
+* [Unsupervised extraction, classification and visualization of clinical note segments using the MIMIC-III dataset](https://ieeexplore.ieee.org/abstract/document/10385342) ([git](https://github.com/ZepZep/mimic-notes-extraction))
+* [Computing Patient Similarity Based on Unstructured Clinical Notes](https://link.springer.com/chapter/10.1007/978-3-032-02551-7_13)
+
 
 ## Environment variables
 The scripts and notebooks expcet two envoronment variables:
